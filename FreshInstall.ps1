@@ -1,3 +1,8 @@
+#
+# Can be run as-is by running:
+#
+# iex (new-object net.webclient).downloadstring('https://code.lksz.me/lksz/szcoop/raw/branch/master/FreshInstall.ps1')
+
 # Set this to the root of Scoop
 $local:_ScoopRoot = 'C:\_\bin\_Scoop'
 
