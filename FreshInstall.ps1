@@ -2,9 +2,8 @@ $local:_ScoopRoot = $_ScoopRoot; if( -not $_ScoopRoot ) { $_ScoopRoot =
 #
 # Can be run as-is by running:
 #
-# > iex (new-object net.webclient).downloadstring(
-#     'https://code.lksz.me/lksz/szcoop/raw/branch/master/FreshInstall.ps1'
-#   )
+# > iex (new-object net.webclient).downloadstring('https://code.lksz.me/lksz/szcoop/raw/branch/master/FreshInstall.ps1')
+#
 ###################################################################################
 # Set this to the root of Scoop
 'C:\Scoop'
