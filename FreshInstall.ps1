@@ -46,9 +46,12 @@ scoop bucket add extras
 scoop bucket add scoop-completion https://github.com/liuzijing97/scoop-completion
 scoop install scoop-completion
 $local:aliasList = scoop | Out-String -Width 17; # instead of scoop alias list which outputs to out-warning when empty
-'autocomplete-off','autocomplete-on' | Where-Object { $aliasList -match $_ } | ForEach-Object { scoop alias rm $_ |  out-null }
+'autocomplete-off','autocomplete-on','export-ps','refresh' | Where-Object { $aliasList -match $_ } | ForEach-Object { scoop alias rm $_ |  out-null }
 scoop alias add autocomplete-on  'Get-Module -ListAvailable $env:SCOOP\modules\* | Where-Object Name -eq scoop-completion | Import-Module'
 scoop alias add autocomplete-off 'Get-Module scoop-completion | Remove-Module'
+# add a scoop alias, to create a collection of objects:
+scoop alias add export-ps 'scoop export | sls ''^(.+)\W\(v:(.+)\) \[(.+)\]$'' |% { [PSCustomObject] ([ordered]@{AppName=$_.matches.groups[1].value;Version=$_.matches.groups[2].value;Bucket=$_.matches.groups[3].value}) }'
+scoop alias add refresh "Start-Process -NoNewWindow -Wait cmd -ArgumentList '/c','scoop','update','>NUL'; scoop status"
 scoop autocomplete-on
 
 ## prepare PowerShell profiles
