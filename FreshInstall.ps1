@@ -50,7 +50,21 @@ $local:aliasList = scoop | Out-String -Width 17; # instead of scoop alias list w
 scoop alias add autocomplete-on  'Get-Module -ListAvailable $env:SCOOP\modules\* | Where-Object Name -eq scoop-completion | Import-Module'
 scoop alias add autocomplete-off 'Get-Module scoop-completion | Remove-Module'
 # add a scoop alias, to create a collection of objects:
-scoop alias add export-ps 'scoop export | sls ''^(.+)\W\(v:(.+)\) \[(.+)\]$'' |% { [PSCustomObject] ([ordered]@{AppName=$_.matches.groups[1].value;Version=$_.matches.groups[2].value;Bucket=$_.matches.groups[3].value}) }'
+scoop alias add export-ps 'param([string[]]$filter,[switch]$WithPath)
+ scoop export | sls ''^(.+)\W\(v:(.+)\)( \*global\*)? \[(.+)\]$'' |% {
+     $local:p=$_.matches.groups;
+     if($filter -and $p[1].value -notin $filter){return};
+     $local:r = [ordered]@{
+         AppName=$p[1].value;
+         Version=$p[2].value;
+         Scope=if($p[3].value){"Global"}else{"Local"};
+         Bucket=$p[4].value
+     };
+     if($WithPath){
+         $r.AppPath=$(($local:tmp = scoop info $p[1].value) | sls "Installed:" | % { Join-Path (Split-Path -Parent (($tmp[$_.LineNumber].Replace(" *global*","")).Trim())) "current" })
+     };
+     [PSCustomObject]($r)
+ }'
 scoop alias add refresh "Start-Process -NoNewWindow -Wait cmd -ArgumentList '/c','scoop','update','>NUL'; scoop status"
 scoop autocomplete-on
 
