@@ -68,21 +68,16 @@ scoop alias add export-ps 'param([string[]]$filter,[switch]$WithPath)
 scoop alias add refresh "Write-Host -Foreground DarkGreen 'Refreshing scoop...'; Start-Process -NoNewWindow -Wait cmd -ArgumentList '/c','scoop','update','>NUL'; scoop status"
 scoop autocomplete-on
 
-## prepare PowerShell profiles
-$_profilePath = $PROFILE -replace '\.PowerShell_profile\.','.PowerShellISE_profile.'
-if( -not (Test-Path $_profilePath) -or ((Get-Content $_profilePath | Out-String) -notmatch '\$PROFILE -replace') ) {
-    Add-Content -Path $_profilePath -Value "`n. (`$PROFILE -replace '\.PowerShellISE_profile\.','.PowerShell_profile.')"
-}
-
-# Setup default profile:
+## prepare PowerShell default profile:
 # Setup SCOOP_GLOBAL if not set (most commonly, because no Admin access)
 # Activate scoop-completion in default profile
-$local:_profilePath = Join-Path (Split-Path -Parent $profile.AllUsersCurrentHost) 'Microsoft.PowerShell_profile.ps1'
+$local:_profilePath = $profile.CurrentUserAllHosts
+if( $IsAdmin ) { _profilePath = $profile.AllUsersAllHosts }
 if( -not (Test-Path $_profilePath) -or ((Get-Content -Path $_profilePath | out-string ) -notmatch 'scoop-completion' ) ) { 
+    New-Item -ItemType Directory $(Split-Path -Parent $_profilePath) -Force | Out-Null
     Add-Content -Path $_profilePath -Value "`nif( -not `$env:SCOOP_GLOBAL ) { `$env:SCOOP_GLOBAL = Split-Path -Parent `$env:SCOOP }"
     Add-Content -Path $_profilePath -Value "`nscoop autocomplete-on"
 }
-
 # update buckets
 scoop update
 
