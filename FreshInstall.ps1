@@ -65,7 +65,7 @@ scoop alias add export-ps 'param([string[]]$filter,[switch]$WithPath)
      };
      [PSCustomObject]($r)
  }'
-scoop alias add refresh "Start-Process -NoNewWindow -Wait cmd -ArgumentList '/c','scoop','update','>NUL'; scoop status"
+scoop alias add refresh "Write-Host -Foreground DarkGreen 'Refreshing scoop...'; Start-Process -NoNewWindow -Wait cmd -ArgumentList '/c','scoop','update','>NUL'; scoop status"
 scoop autocomplete-on
 
 ## prepare PowerShell profiles
