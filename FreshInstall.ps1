@@ -2,7 +2,7 @@ $local:_ScoopRoot = $_ScoopRoot; if( -not $_ScoopRoot ) { $_ScoopRoot =
 #
 # Can be run as-is by running:
 #
-# > iex (new-object net.webclient).downloadstring('https://code.lksz.me/lksz/szcoop/raw/branch/master/FreshInstall.ps1')
+# > iex (new-object net.webclient).downloadstring('https://lksz.me/szcoop')
 #
 ###################################################################################
 # Set this to the root of Scoop
@@ -72,7 +72,7 @@ scoop autocomplete-on
 # Setup SCOOP_GLOBAL if not set (most commonly, because no Admin access)
 # Activate scoop-completion in default profile
 $local:_profilePath = $profile.CurrentUserAllHosts
-if( $IsAdmin ) { _profilePath = $profile.AllUsersAllHosts }
+if( $IsAdmin ) { $_profilePath = $profile.AllUsersAllHosts }
 if( -not (Test-Path $_profilePath) -or ((Get-Content -Path $_profilePath | out-string ) -notmatch 'scoop-completion' ) ) { 
     New-Item -ItemType Directory $(Split-Path -Parent $_profilePath) -Force | Out-Null
     Add-Content -Path $_profilePath -Value "`nif( -not `$env:SCOOP_GLOBAL ) { `$env:SCOOP_GLOBAL = Split-Path -Parent `$env:SCOOP }"
