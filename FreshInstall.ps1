@@ -45,6 +45,7 @@ scoop bucket add extras
 # Add scoop-completion bucket, followed by installation
 scoop bucket add scoop-completion https://github.com/liuzijing97/scoop-completion
 scoop install scoop-completion
+######### ALIAS SECTION #########
 $local:installAliases = [ordered]@{}
 $installAliases['autocomplete-on' ] = 'Get-Module -ListAvailable $env:SCOOP\modules\* | Where-Object Name -eq scoop-completion | Import-Module'
 $installAliases['autocomplete-off'] = 'Get-Module scoop-completion | Remove-Module'
@@ -56,6 +57,7 @@ $installAliases['refresh'         ] = 'Write-Host -Foreground DarkGreen "Refresh
 
 # add aliases defined above, making sure it is overwritten by any other alias already existing.
 $installAliases.Keys | % { $(scoop alias rm $_ *>&1 | out-null); scoop alias add $_ $installAliases[$_] }
+#########
 
 # activate autocomplete (with alias defined above)
 scoop autocomplete-on
