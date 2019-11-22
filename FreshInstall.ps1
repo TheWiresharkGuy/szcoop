@@ -54,7 +54,7 @@ $installAliases['export-ps'       ] = 'param([string[]]$filter,[switch]$WithPath
 $installAliases['alias-list'      ] = 'scoop alias list *>&1 | Out-String -Stream | sls "^[^ ]+" | % { $_.matches.Value }'
 # alias, for cleaner output of refresh:
 $installAliases['refresh'         ] = 'Write-Host -Foreground DarkGreen "Refreshing scoop..."; (scoop update *>&1 | Out-Null); scoop status'
-$installAliases['alias-update'    ] = '$local:szcoopSrc = $szcoopSrc; if( -not $szcoopSrc ) { $szcoopSrc = (new-object net.webclient).downloadstring("https://lksz.me/szcoop") }; scoop alias-list | % { scoop alias rm $_ }; Invoke-Expression ($szcoopSrc -split ("ALIAS SECTION " + "#"))[1]'
+$installAliases['alias-update'    ] = '$local:szcoopSrc = $szcoopSrc; if( -not $szcoopSrc ) { $szcoopSrc = (new-object net.webclient).downloadstring("https://lksz.me/szcoop") }; Write-Host -ForegroundColor DarkGreen "Refreshing aliases..."; scoop alias-list | % { scoop alias rm $_ }; Invoke-Expression ($szcoopSrc -split ("ALIAS SECTION " + "#"))[1]; Write-Host -ForegroundColor DarkGreen "Aliases updated:"; scoop alias-list'
 
 # add aliases defined above, making sure it is overwritten by any other alias already existing.
 $installAliases.Keys | % { $(scoop alias rm $_ *>&1 | out-null); scoop alias add $_ $installAliases[$_] }
