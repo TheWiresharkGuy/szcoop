@@ -47,6 +47,8 @@ scoop bucket add scoop-completion https://github.com/liuzijing97/scoop-completio
 scoop install scoop-completion
 ######### BEGIN ALIAS SECTION #########
 $local:installAliases = [ordered]@{}
+$installAliases['alias-update'    ] = '$local:szcoopSrc = $szcoopSrc; if( -not $szcoopSrc ) { $szcoopSrc = (new-object net.webclient).downloadstring("https://lksz.me/szcoop") }; Write-Host -ForegroundColor DarkGreen "Refreshing aliases..."; scoop alias-list | % { scoop alias rm $_ }; Invoke-Expression ($szcoopSrc -split ("ALIAS SECTION " + "#"))[1]; Write-Host -ForegroundColor DarkGreen "Aliases updated:"; scoop alias-list'
+# function update-scoopalias { iex $installAliases['alias-update'] }; update-scoopalias; update-scoopalias; # select this line with the 2 above to only update/refresh the aliases.
 $installAliases['autocomplete-on' ] = 'Get-Module -ListAvailable $env:SCOOP\modules\* | Where-Object Name -eq scoop-completion | Import-Module'
 $installAliases['autocomplete-off'] = 'Get-Module scoop-completion | Remove-Module'
 # alias to create an objects based export:
@@ -55,7 +57,6 @@ $installAliases['export-ps-ex'    ] = 'scoop export-ps | sort Scope,AppName'
 $installAliases['alias-list'      ] = 'scoop alias list *>&1 | Out-String -Stream | sls "^[^ ]+" | % { $_.matches.Value }'
 # alias, for cleaner output of refresh:
 $installAliases['refresh'         ] = 'Write-Host -Foreground DarkGreen "Refreshing scoop..."; (scoop update *>&1 | Out-Null); scoop export-ps | Where-Object "UpdateAvailable" -ne $null | Sort-Object Scope,AppName | ft -AutoSize'
-$installAliases['alias-update'    ] = '$local:szcoopSrc = $szcoopSrc; if( -not $szcoopSrc ) { $szcoopSrc = (new-object net.webclient).downloadstring("https://lksz.me/szcoop") }; Write-Host -ForegroundColor DarkGreen "Refreshing aliases..."; scoop alias-list | % { scoop alias rm $_ }; Invoke-Expression ($szcoopSrc -split ("ALIAS SECTION " + "#"))[1]; Write-Host -ForegroundColor DarkGreen "Aliases updated:"; scoop alias-list'
 
 # add aliases defined above, making sure it is overwritten by any other alias already existing.
 $installAliases.Keys | % { $(scoop alias rm $_ *>&1 | out-null); scoop alias add $_ $installAliases[$_] }
