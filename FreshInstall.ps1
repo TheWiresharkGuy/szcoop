@@ -70,7 +70,7 @@ scoop autocomplete-on
 # Activate scoop-completion in default profile
 $local:_profilePath = $profile.CurrentUserAllHosts
 if( $IsAdmin ) { $_profilePath = $profile.AllUsersAllHosts }
-if( -not (Test-Path $_profilePath) -or ((Get-Content -Path $_profilePath | out-string ) -notmatch 'scoop-completion' ) ) { 
+if( -not (Test-Path $_profilePath) -or ((Get-Content -Path $_profilePath | out-string ) -notmatch 'autocomplete-on' ) ) { 
     New-Item -ItemType Directory $(Split-Path -Parent $_profilePath) -Force | Out-Null
     Add-Content -Path $_profilePath -Value "`nif( -not `$env:SCOOP_GLOBAL ) { `$env:SCOOP_GLOBAL = Split-Path -Parent `$env:SCOOP }"
     Add-Content -Path $_profilePath -Value "`nscoop autocomplete-on"
