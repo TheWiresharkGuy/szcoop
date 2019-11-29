@@ -43,7 +43,7 @@ iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 
 scoop bucket add extras
 # Add scoop-completion bucket, followed by installation
-scoop bucket add scoop-completion https://github.com/liuzijing97/scoop-completion
+scoop bucket add scoop-completion https://github.com/Moeologist/scoop-completion
 scoop install scoop-completion
 ######### BEGIN ALIAS SECTION #########
 $local:installAliases = [ordered]@{}
