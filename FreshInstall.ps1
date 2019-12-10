@@ -37,7 +37,6 @@ function Install-Szcoop {
         Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name 'LongPathsEnabled' -Value 1
     }
 
-    return
     iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 
     & scoop install $useGlobal 7zip git innounp dark aria2
