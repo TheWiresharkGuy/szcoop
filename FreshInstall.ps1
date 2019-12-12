@@ -1,7 +1,7 @@
 #
 # To run this function, copy-paste the following line into a PowerShell session
 #
-# > iex (new-object net.webclient).downloadstring('https://lksz.me/szcoop'); Install-Szcoop [-ScoopRoot 'C:\_\bin\_scoop']
+# > iex (new-object net.webclient).downloadstring('https://lksz.me/szcoop'); Install-Szcoop #[-ScoopRoot 'C:\_\bin\_scoop']
 #
 function Install-Szcoop {
     param ( [string]$ScoopRoot = 'C:\Scoop' )
