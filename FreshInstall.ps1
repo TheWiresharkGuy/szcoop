@@ -71,9 +71,18 @@ function Install-Szcoop {
     $local:_profilePath = $profile.CurrentUserAllHosts
     if( $IsAdmin ) { $_profilePath = $profile.AllUsersAllHosts }
     if( -not (Test-Path $_profilePath) -or ((Get-Content -Path $_profilePath | out-string ) -notmatch 'autocomplete-on' ) ) { 
-        New-Item -ItemType Directory $(Split-Path -Parent $_profilePath) -Force | Out-Null
-        Add-Content -Path $_profilePath -Value "`nif( -not `$env:SCOOP_GLOBAL ) { `$env:SCOOP_GLOBAL = Split-Path -Parent `$env:SCOOP }"
-        Add-Content -Path $_profilePath -Value "`nscoop autocomplete-on"
+        if( -not (Test-Path $_profilePath) ) { New-Item -ItemType Directory $(Split-Path -Parent $_profilePath) -Force | Out-Null }
+        Add-Content -Path $_profilePath -Value @('',
+                'if( -not $env:SCOOP ) { $env:SCOOP = "' + $(Join-Path $ScoopRoot '_') + '$($env:USERNAME)" }',
+                'if( -not $env:SCOOP_GLOBAL ) { $env:SCOOP_GLOBAL = Split-Path -Parent $env:SCOOP }',
+                '',
+                'if( -not $($env:Path -match $($env:SCOOP_GLOBAL -replace "\\","\\")) ) {',
+                '  $env:Path = "$(Join-Path $env:SCOOP shims);$(Join-Path $env:SCOOP_GLOBAL shims);$($env:Path)"',
+                '}',
+                '',
+                'scoop autocomplete-on'
+            )
+
     }
     # update buckets
     scoop update
