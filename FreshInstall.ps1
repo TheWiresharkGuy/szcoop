@@ -1,8 +1,19 @@
 #
-# To run this function, copy-paste the following line into a PowerShell session
+### To run this function, copy-paste the following line into a PowerShell session
 #
-# > iwr 'https://lksz.me/szcoop' | iex; Install-Szcoop #-ScoopRoot 'C:\_\bin\_scoop'
+# iwr 'https://lksz.me/szcoop' | iex
+# Install-Szcoop -ScoopRoot 'C:\Scoop'
 #
+### or just
+# Install-Szcoop
+#
+### In case the IWR command fails try the code below.
+# $wc = $(New-Object System.Net.WebClient); $wc.DownloadString('https://lksz.me/szcoop') | iex
+#
+### TLS 1.2 might need to be allowed by the following:
+# [Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+#
+
 function Install-Szcoop {
     param ( [string]$ScoopRoot = 'C:\Scoop' )
 
