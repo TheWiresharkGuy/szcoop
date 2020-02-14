@@ -8,16 +8,17 @@
 # Install-Szcoop
 #
 ### In case the IWR command fails try the code below.
-# $wc = $(New-Object System.Net.WebClient); $wc.DownloadString('https://lksz.me/szcoop') | iex
+# iex $(New-Object System.Net.WebClient).DownloadString('https://lksz.me/szcoop')
 #
 ### TLS 1.2 might need to be allowed by the following:
 # [Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 #
+### An additional utility funciton is included, in case you're running an old version of PowerShell:
+# Install-PowerShellCore #[-TargetPath 'C:\_\bin\pwsh'] [-DontStartPwsh] [-ForceFresh] [-Cleanup]
+#
 
 function Install-Szcoop {
     param ( [string]$ScoopRoot = 'C:\Scoop' )
-
-    Remove-Item Function:Install-Szcoop
 
     $local:_ScoopRoot = $ScoopRoot;
 
@@ -51,6 +52,8 @@ function Install-Szcoop {
     iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 
     & scoop install $useGlobal 7zip git innounp dark aria2
+
+    Remove-Item Function:Install-Szcoop,Function:Install-PowerShellCore -ErrorAction SilentlyContinue
 
     scoop bucket add extras
     # Add scoop-completion bucket, followed by installation
@@ -103,4 +106,61 @@ function Install-Szcoop {
     scoop cleanup *
 
     scoop checkup
+}
+
+
+function Install-PowerShellCore {
+param(
+    [string]$TargetPath = 'C:\_\bin\pwsh',
+    [switch]$DontStartPwsh,
+    [switch]$ForceFresh,
+    [switch]$Cleanup
+)
+    try {
+        Write-Host -ForegroundColor DarkYellow "Downloading PowerShell Core manifest from main scoop.sh bucket..."
+        [Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+        $local:wc = $(New-Object System.Net.WebClient);
+        $local:PwshScoopJson = $wc.DownloadString('https://raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/pwsh.json') | ConvertFrom-Json
+
+        $local:pwshUrl = $PwshScoopJson.architecture.'64bit'.url
+        $local:pwshArchive = $(Join-Path $env:TEMP $(Split-Path -Leaf $pwshUrl))
+
+        if( Test-Path $pwshArchive ) {
+            Write-Host -ForegroundColor DarkYellow "Removing already existing file [$pwshArchive]..."
+            Remove-Item -Path $pwshArchive -Force | Out-Null
+        }
+        Write-Host -ForegroundColor DarkYellow "Downloading PowerShell Core zip release..."
+        $wc.DownloadFile( $pwshUrl, $pwshArchive )
+        Unblock-File $pwshArchive
+
+        if( $(Test-Path $TargetPath) -and $ForceFresh ) {
+            Write-Host -ForegroundColor DarkYellow "Removing pre-existing directory [$TargetPath]..."
+            Remove-Item -Path $TargetPath -Force -Recurse | Out-Null
+        }
+
+        Write-Host -ForegroundColor DarkYellow "Extract downloaded zip into target location..."
+        New-Item -ItemType Directory -Path $TargetPath -Force | Out-Null
+        [System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null
+        [System.IO.Compression.ZipFile]::ExtractToDirectory($pwshArchive, $TargetPath)
+
+        if( -not $DontStartPwsh ) {
+            Write-Host -ForegroundColor DarkYellow "Starting PowerShell Core..."
+            Start-Process $(Join-Path $TargetPath pwsh.exe)
+        }
+
+        if( $Cleanup ) {
+            if( Test-Path $pwshArchive ) {
+                Write-Host -ForegroundColor DarkYellow "Removing downloaded [$pwshArchive]..."
+                Remove-Item -Path $pwshArchive -Force | Out-Null
+            }
+        }
+
+        Write-Host -ForegroundColor DarkYellow "All done."
+        Write-Host -NoNewline -ForegroundColor DarkCyan "ZIP downloaded from: "; Write-Host -ForegroundColor Cyan "$pwshUrl"
+        if( -not $Cleanup ) {
+            Write-Host -NoNewline -ForegroundColor DarkCyan "Temp ZIP File (ok to remove): "; Write-Host -ForegroundColor Cyan "$pwshArchive"
+        }
+        Write-Host -NoNewline -ForegroundColor DarkCyan "PowerShell core can be run from: "; Write-Host -ForegroundColor Cyan "$TargetPatht"
+    } finally {
+    }
 }
