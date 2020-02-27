@@ -72,32 +72,35 @@ function Install-Szcoop {
     # alias, for cleaner output of refresh:
     $installAliases['refresh'         ] = 'Write-Host -Foreground DarkGreen "Refreshing scoop..."; (scoop update *>&1 | Out-Null); scoop export-ps | Where-Object "UpdateAvailable" -ne $null | Sort-Object Scope,AppName | ft -AutoSize'
 
-    # add aliases defined above, making sure it is overwritten by any other alias already existing.
-    $installAliases.Keys | % { $(scoop alias rm $_ *>&1 | out-null); scoop alias add $_ $installAliases[$_] }
-    ######### END ALIAS SECTION #########
-
-    # activate autocomplete (with alias defined above)
-    scoop autocomplete-on
-
     ## prepare PowerShell default profile:
     # Setup SCOOP_GLOBAL if not set (most commonly, because no Admin access)
     # Activate scoop-completion in default profile
-    $local:_profilePath = $profile.CurrentUserAllHosts
-    if( $IsAdmin ) { $_profilePath = $profile.AllUsersAllHosts }
-    if( -not (Test-Path $_profilePath) -or ((Get-Content -Path $_profilePath | out-string ) -notmatch 'autocomplete-on' ) ) { 
-        if( -not (Test-Path $_profilePath) ) { New-Item -ItemType Directory $(Split-Path -Parent $_profilePath) -Force | Out-Null }
-        Add-Content -Path $_profilePath -Value @('',
-                'if( -not $env:SCOOP ) { $env:SCOOP = "' + $(Join-Path $ScoopRoot '_') + '$($env:USERNAME)" }',
-                'if( -not $env:SCOOP_GLOBAL ) { $env:SCOOP_GLOBAL = Split-Path -Parent $env:SCOOP }',
+    $installAliases['setup-profile'  ] = @"   
+    `$local:_profilePath = `$profile.CurrentUserAllHosts
+    if( `$IsAdmin ) { `$_profilePath = `$profile.AllUsersAllHosts }
+    if( -not (Test-Path `$_profilePath) -or ((Get-Content -Path `$_profilePath | out-string ) -notmatch 'autocomplete-on' ) ) { 
+        if( -not (Test-Path `$_profilePath) ) { New-Item -ItemType Directory $(Split-Path -Parent `$_profilePath) -Force | Out-Null }
+        Add-Content -Path `$_profilePath -Value @('',
+                ('if( -not `$env:SCOOP ) { `$env:SCOOP = "' + `$(Join-Path $env:SCOOP_GLOBAL '_') + '`$(`$env:USERNAME)" }'),
+                'if( -not `$env:SCOOP_GLOBAL ) { `$env:SCOOP_GLOBAL = Split-Path -Parent `$env:SCOOP }',
                 '',
-                'if( -not $($env:Path -match $($env:SCOOP_GLOBAL -replace "\\","\\")) ) {',
-                '  $env:Path = "$(Join-Path $env:SCOOP shims);$(Join-Path $env:SCOOP_GLOBAL shims);$($env:Path)"',
+                'if( -not `$(`$env:Path -match `$(`$env:SCOOP_GLOBAL -replace "\\","\\")) ) {',
+                '  `$env:Path = "`$(Join-Path `$env:SCOOP shims);`$(Join-Path `$env:SCOOP_GLOBAL shims);`$(`$env:Path)"',
                 '}',
                 '',
                 'scoop autocomplete-on'
             )
-
     }
+"@
+
+    # add aliases defined above, making sure it is overwritten by any other alias already existing.
+    $installAliases.Keys | % { $(scoop alias rm $_ *>&1 | out-null); scoop alias add $_ $installAliases[$_] }
+    ######### END ALIAS SECTION #########
+
+    # with aliases defined above: activate autocomplete, setup profile
+    scoop autocomplete-on
+    scoop setup-profile
+
     # update buckets
     scoop update
 
