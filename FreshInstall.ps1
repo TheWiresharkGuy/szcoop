@@ -79,7 +79,7 @@ function Install-Szcoop {
     `$local:_profilePath = `$profile.CurrentUserAllHosts
     if( `$IsAdmin ) { `$_profilePath = `$profile.AllUsersAllHosts }
     if( -not (Test-Path `$_profilePath) -or ((Get-Content -Path `$_profilePath | out-string ) -notmatch 'autocomplete-on' ) ) { 
-        if( -not (Test-Path `$_profilePath) ) { New-Item -ItemType Directory $(Split-Path -Parent `$_profilePath) -Force | Out-Null }
+        if( -not (Test-Path `$_profilePath) ) { New-Item -ItemType Directory `$(Split-Path -Parent `$_profilePath) -Force | Out-Null }
         Add-Content -Path `$_profilePath -Value @('',
                 ('if( -not `$env:SCOOP ) { `$env:SCOOP = "' + `$(Join-Path $env:SCOOP_GLOBAL '_') + '`$(`$env:USERNAME)" }'),
                 'if( -not `$env:SCOOP_GLOBAL ) { `$env:SCOOP_GLOBAL = Split-Path -Parent `$env:SCOOP }',
