@@ -1,3 +1,3 @@
 # szcoop
 
-My own personal repository
+Forked from [szcoop](https://code.lksz.me/lksz/szcoop)
